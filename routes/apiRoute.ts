@@ -1,11 +1,12 @@
 import express from "express";
-import { prisma } from "../lib/prisma.js";
+
 import {
   createUser,
   deleteUser,
   getUserById,
   getUsers,
   updateUser,
+  auth,
 } from "../controllers/userController.js";
 import {
   createPost,
@@ -14,6 +15,7 @@ import {
   getPosts,
   updatePost,
 } from "../controllers/postController.js";
+import { authorisationJWT } from "../midlware/authorisationJWT.js";
 
 const route = express.Router();
 route.use(express.json());
@@ -23,10 +25,11 @@ route.get("/", (req: Request, res: Response) => {
 });
 /*route de user*/
 route.get("/users", getUsers);
-route.post("/create-user", createUser);
-route.delete("/delete-user/:id", deleteUser);
-route.put("/update-user/:id", updateUser);
+route.post("/create-user", authorisationJWT, createUser);
+route.delete("/delete-user/:id", authorisationJWT, deleteUser);
+route.put("/update-user/:id", authorisationJWT, updateUser);
 route.get("/user/:id", getUserById);
+route.post("/login", auth);
 /* route de post*/
 route.post("/post/create", createPost);
 route.get("/posts", getPosts);
