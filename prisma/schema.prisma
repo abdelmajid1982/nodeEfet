@@ -12,18 +12,34 @@ generator client {
 datasource db {
   provider = "mysql"
 }
+enum Role {
+  ETUDIANT
+  ENSEIGNANT  
+  ADMIN
+}
 model User { 
   id    Int     @id @default(autoincrement()) 
   email String  @unique
   name  String?
   password String
-  posts Post[]
+  role  Role    @default(ETUDIANT)
+  cours Cours[]
+  notes Note[]
+
 } 
-model Post { 
-  id        Int     @id @default(autoincrement()) 
-  title     String
-  content   String? @db.Text
-  published Boolean @default(false) 
-  author    User    @relation(fields: [authorId], references: [id]) 
-  authorId  Int
+model Cours{
+  id    Int     @id @default(autoincrement()) 
+  title String
+  description String? @db.Text
+  notes Note[]
+  teacher User @relation(fields: [teacherId], references: [id]) 
+  teacherId Int
+}
+model Note {
+  id Int @id @default(autoincrement())
+  value Float
+  student User @relation(fields: [studentId], references: [id])
+  studentId Int
+  course Cours @relation(fields: [courseId], references: [id])
+  courseId Int
 }
