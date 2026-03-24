@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 
 import {
   createUser,
@@ -25,14 +26,33 @@ import {
 } from "../controllers/noteController.js";
 import { createNote } from "../controllers/noteController.js";
 
+import multer from "multer";
+import path from "path";
 const route = express.Router();
+
 route.use(express.json());
 route.use(express.urlencoded({ extended: true }));
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "images/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+const upload = multer({ storage: storage });
 route.get("/", (req: Request, res: Response) => {
   res.send("<h1>Hello world</h1>");
 });
 //*route de cours*/
-route.post("/cours/create", createCours);
+route.post("/cours/create", upload.single("file"), (req, res) => {
+  if (!req.file) {
+    res.json({ message: "file not existe" });
+  } else {
+    console.log("ok");
+    res.status(201).json({ message: "bien ajouter" });
+  }
+});
 route.get("/cours", getCours);
 route.get("/cours/:id", getCoursById);
 route.delete("/cours/:id", deleteCours);
